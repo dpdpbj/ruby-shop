@@ -1,0 +1,21 @@
+FROM ruby:2.6.3
+
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs --fix-missing
+
+RUN mkdir /shop
+WORKDIR /shop
+ADD . /shop
+
+RUN bundle package
+
+#RUN cp ./RubyDC/stacktracer-08.19.12.00.gem /shop/vendor/cache/stacktracer-08.19.12.00.gem
+#RUN echo "gem 'stacktracer'" >> Gemfile
+
+RUN bundle install
+
+COPY docker-entrypoint.sh /usr/local/bin
+
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh \
+    && ln -s /usr/local/bin/docker-entrypoint.sh /
+
+ENTRYPOINT ["docker-entrypoint.sh"]
